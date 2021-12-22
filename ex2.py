@@ -31,11 +31,12 @@ def MinnEntropy(nb_comp,nb_iter,lattice):
 
     Result = [0] * nb_comp
     for k in range(nb_comp):
-        temp = lattice
+        temp = np.zeros(s)
+        temp[9][9],temp[9][10],temp[10][9],temp[10][10] = 100,100,100,100
         temp = time_step(nb_iter,temp)
         #print('\n{}\n'.format(temp))
         Result[k] = EntropyCalc(temp,rows,cols)
-    ResultMin = min(Result)
+    ResultMin = statistics.mean(Result)
     
     return ResultMin
     
@@ -47,13 +48,14 @@ for i in range(9,11):
     for j in range(9,11):
         lattice[i][j] = 100
 
-t_s = 5
+t_s = 1
 n_c = 25
 size = 10
 entropy = [0] * size
 arrt = [0]*size
 for i in range(size):
     entropy[i] = MinnEntropy(n_c,t_s,lattice)
+    print('For {} entropy is {}'.format(t_s,entropy[i]))
     arrt[i] = t_s
     t_s+=1
 EntropyMean = statistics.mean(entropy)
@@ -80,7 +82,7 @@ plt.ylabel('Time steps')
 plot3 = plt.figure(3)
 
 f = interpolate.interp1d(arrt, entropy,axis =0,fill_value='extralopate')
-timeNew = np.linspace(9,10,10)
+timeNew = np.linspace(1,10,10)
 EntropyNew = f(timeNew)
 plt.plot(arrt,entropy,'o',timeNew,EntropyNew,'-') 
 plt.show()
