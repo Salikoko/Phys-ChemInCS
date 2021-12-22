@@ -1,8 +1,11 @@
+from PIL.Image import linear_gradient
 import matplotlib.pyplot as plt
 import numpy as np
 import random
 import statistics
+from numpy.lib.scimath import sqrt
 from scipy.interpolate import interpolate
+from scipy.optimize import curve_fit
 from direction import move_rand
 rows,cols = 20,20
 p=0.8
@@ -34,14 +37,16 @@ def MinnEntropy(nb_comp,nb_iter,lattice):
         temp = np.zeros(s)
         temp[9][9],temp[9][10],temp[10][9],temp[10][10] = 100,100,100,100
         temp = time_step(nb_iter,temp)
+        if k==nb_comp-1: lattice = time_step(nb_iter,lattice)
         #print('\n{}\n'.format(temp))
         Result[k] = EntropyCalc(temp,rows,cols)
     ResultMin = statistics.mean(Result)
     
     return ResultMin
     
-
-
+def PotentialFormula(x,A,B):
+    y = A*sqrt(x) +B
+    return y
 
 lattice = np.zeros(s)
 for i in range(9,11):
@@ -55,13 +60,12 @@ entropy = [0] * size
 arrt = [0]*size
 for i in range(size):
     entropy[i] = MinnEntropy(n_c,t_s,lattice)
-    print('For {} entropy is {}'.format(t_s,entropy[i]))
     arrt[i] = t_s
     t_s+=1
 EntropyMean = statistics.mean(entropy)
 
 
-print('For {} time steps and {} computations,Entropy is {}\n'.format(t_s,n_c,entropy[1]))
+print('For {} taime steps and {} computations,Entropy is {}\n'.format(t_s,n_c,entropy[1]))
 sum = 0
 for i in range(20):
     for j in range(20):
@@ -74,15 +78,20 @@ plt.imshow(lattice, interpolation='nearest',aspect='equal',extent=[-rows,rows,-c
 plt.xlabel('Entropy = {}\nTime step = {} Number of computations = {}'.format(entropy[1],t_s,n_c))
 
 plot2 = plt.figure(2)
-plt.plot(entropy,arrt)
+plt.plot(arrt,entropy)
 plt.xlabel('Entropy')
 plt.ylabel('Time steps')
 
 
 plot3 = plt.figure(3)
 
-f = interpolate.interp1d(arrt, entropy,axis =0,fill_value='extralopate')
-timeNew = np.linspace(1,10,10)
-EntropyNew = f(timeNew)
-plt.plot(arrt,entropy,'o',timeNew,EntropyNew,'-') 
+
+parameters, covariance = curve_fit(PotentialFormula,arrt,entropy)
+fit_A = parameters[0]
+fit_B = parameters[1]
+fit_y = PotentialFormula(arrt,fit_A,fit_B)
+plt.plot(arrt,entropy,'o',label = 'Data')
+plt.plot(arrt,fit_y,'-',label='fit')
+plt.xlabel('y = {}*sqrt(x) + {}'.format(fit_A,fit_B))
+plt.legend()
 plt.show()
