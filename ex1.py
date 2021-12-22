@@ -24,13 +24,34 @@ def EndPoint(start_p,nb_steps,iter,p):
 
 steps = int(input('Enter number of steps for a drunk walker: '))
 iter = int(input('Enter number of iterations: '))
+prob = float(input('Enter probability value: '))
 start_point = 0
-results = EndPoint(start_point,steps,iter,0.5)
+results = EndPoint(start_point,steps,iter,prob)
 
 SD = round(statistics.stdev(results),2)     #Standard devaiation
 MN = round(statistics.mean(results),2)      #Mean
 
+first_part = 0
+second_part = 0
+third_part = 0
+
+for i in range(iter):
+    if (results[i] >= MN - SD) and (results[i] <= MN + SD):
+        first_part += 1
+        second_part += 1
+        third_part += 1
+    elif (results[i] >= MN - 2*SD) and (results[i] <= MN + 2*SD):
+        second_part += 1
+        third_part += 1
+    elif (results[i] >= MN - 3*SD) and (results[i] <= MN + 3*SD):
+        third_part += 1
+
 print('Standard deviaton {}\nMean {}'.format(SD,MN))
+# the number of records is 100, so division by it turns to 1 after multiplying by 100%
+# so the counted values are equal to the percentage
+print('Percentage of values in first partition: {}'.format(first_part))
+print('Percentage of values in second partition: {}'.format(second_part))
+print('Percentage of values in third partition: {}'.format(third_part))
 #plot histograph
 n, bins, patches = plt.hist(x=results, bins='auto', color='g',alpha=0.6, rwidth=0.8)
 plt.grid(axis='y', alpha=0.75)
