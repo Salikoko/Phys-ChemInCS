@@ -49,16 +49,17 @@ for i in range(9,11):
 
 t_s = 5
 n_c = 25
-entropy = [0] * 20
-arrt = [0]*20
-for i in range(20):
+size = 10
+entropy = [0] * size
+arrt = [0]*size
+for i in range(size):
     entropy[i] = MinnEntropy(n_c,t_s,lattice)
     arrt[i] = t_s
     t_s+=1
 EntropyMean = statistics.mean(entropy)
 
 
-print('For {} time steps and {} computations,Entropy is {}\n'.format(t_s,n_c,entropy[19]))
+print('For {} time steps and {} computations,Entropy is {}\n'.format(t_s,n_c,entropy[1]))
 sum = 0
 for i in range(20):
     for j in range(20):
@@ -68,16 +69,18 @@ print('Sum of all dry particles \n{}\n'.format(sum))
 
 plot1 = plt.figure(1)
 plt.imshow(lattice, interpolation='nearest',aspect='equal',extent=[-rows,rows,-cols,cols])
-plt.xlabel('Entropy = {}\nTime step = {} Number of computations = {}'.format(entropy[3],t_s,n_c))
+plt.xlabel('Entropy = {}\nTime step = {} Number of computations = {}'.format(entropy[1],t_s,n_c))
 
 plot2 = plt.figure(2)
 plt.plot(entropy,arrt)
 plt.xlabel('Entropy')
 plt.ylabel('Time steps')
 
-# f = interpolate.interp1d(entropy, arrt)
-# plot3 = plt.figure(3)
-# timeNew = np.arange(0,10,1)
-# EntrNew = f(timeNew)
-# plt.plot(entropy,t_s,'o',EntrNew,timeNew,'-') 
+
+plot3 = plt.figure(3)
+
+f = interpolate.interp1d(arrt, entropy,axis =0,fill_value='extralopate')
+timeNew = np.linspace(9,10,10)
+EntropyNew = f(timeNew)
+plt.plot(arrt,entropy,'o',timeNew,EntropyNew,'-') 
 plt.show()
